@@ -1,0 +1,91 @@
+what is rdbms?
+rdbms stand for relational database management system. it is nothing but a software which can interact with our database to get data and store data effectively.
+
+how people used to store data before database?
+before database era, people used to store data in different ways like writing, drawing, etc. this was very inefficient and time consuming.they use to store data in books,register, file system and other things.
+but these methods were not sufficient. the downside of these system were
+1. duplication of data 
+2. slow data retrieval
+3. not having a structure data like random data
+4. there was no relation in data. so data integraity was not maintained.
+5. also it was difficult to manage and update data.
+6. also it was hard to backup the data.
+7.partial update leads to inconsistency
+8. no multi user could access it. if they try to access it, it will be locked.
+9. also they were vulnerable. because physical books file could be stolen or damaged. 
+
+is working of dbms is same is sql working?
+No, the working of a database and SQL are not the same thing. They are two completely different components that work together to manage data.
+To put it simply: a database is the storage room where data is kept, while SQL is the language you use to talk to the person managing that storage room
+assume it like database is like machine
+and sql is like c language who talks to machine.
+and orm/odm like python which is built top of c and other language.
+
+if someone asks about how database works, they usually means they want to know how query is processed or query processing flow.
+
+
+so question is how databaseworks(how query is execute)?
+When you submit a SQL query, the DBMS processes it through several stages:
+
+Parsing:
+The DBMS checks the query syntax for errors and validates object references (e.g., table and column names).
+task:- add chatgpt your example
+Optimization:
+The system evaluates different execution strategies to determine the most efficient one, considering factors like available indexes and data distribution.
+task:- add chatgpt your example
+Execution:
+The DBMS executes the optimized query plan, retrieving and processing the data as specified.
+task:- add chatgpt your example
+
+sql query execution order:-
+Although SQL queries are written in a specific order, the DBMS processes them differently. Understanding this execution order is crucial for constructing accurate queries.
+Standard SQL Query Structure:
+
+SELECT column1, column2
+FROM table_name
+WHERE condition
+GROUP BY column1
+HAVING condition
+ORDER BY column1;
+Actual Execution Order:
+
+FROM:
+Identifies the source tables and performs joins if necessary.
+WHERE:
+Filters rows based on specified conditions.
+GROUP BY:
+Aggregates data into groups based on one or more columns.
+HAVING:
+Filters groups according to conditions (similar to WHERE but applied after grouping).
+SELECT:
+Determines which columns or expressions to return.
+ORDER BY:
+Sorts the result set based on specified columns.
+LIMIT/OFFSET:
+Restricts the number of rows returned.
+This execution sequence explains why certain elements, like column aliases defined in the SELECT clause, cannot be used in the WHERE clause — they haven’t been processed yet.
+
+Practical Example
+Consider the following query:
+
+SELECT department, COUNT(*) AS employee_count
+FROM employees
+WHERE hire_date > '2020-01-01'
+GROUP BY department
+HAVING COUNT(*) > 5
+ORDER BY employee_count DESC;
+Execution Breakdown:
+
+FROM:
+Accesses the employees table.
+WHERE:
+Filters employees hired after January 1, 2020.
+GROUP BY:
+Groups the remaining records by department.
+HAVING:
+Excludes departments with 5 or fewer employees.
+SELECT:
+Retrieves the department name and counts the number of employees in each qualifying group, labeling it as employee_count.
+ORDER BY:
+Sorts the results in descending order of employee_count.
+

@@ -2,6 +2,8 @@
 * What if a hard disk crashes?
 * What if duplicate customer records are accidentally inserted?
 * How does an RDBMS maintain consistency?
+*sql and database are same
+*is working of dbms is same is sql working
 
 ---
 
