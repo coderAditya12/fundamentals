@@ -1,6 +1,6 @@
 # Introduction to System Design
 
-**Status:** Learning
+**Status:** Completed
 **Created:** 2026-07-08
 
 ---
