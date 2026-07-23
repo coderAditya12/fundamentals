@@ -1,0 +1,97 @@
+## Q7. If the CPU executes instructions, why doesn't it execute programs directly? Why does the operating system create this extra layer called a process?
+
+At first, it seems like the CPU should simply read the program from disk and start executing it.
+
+However, a program stored on disk is **just a file** containing instructions. The CPU cannot execute files directly because it only executes instructions that are already loaded into **RAM (memory)**.
+
+The operating system acts as a manager between the program and the CPU.
+
+When you start a program, the operating system performs several tasks before the CPU can execute it.
+
+```text
+Program (Stored on Disk)
+
+↓
+
+Operating System
+
+↓
+
+Load into Memory
+
+↓
+
+Allocate Resources
+
+↓
+
+Create Process
+
+↓
+
+CPU Executes Instructions
+```
+
+The operating system creates a **process** because the CPU needs much more than just the program's instructions.
+
+A running program requires:
+
+* Memory for code, data, heap, and stack
+* CPU registers
+* A program counter (instruction pointer)
+* Open files
+* Network connections
+* Security permissions
+* Scheduling information
+* A Process ID (PID)
+
+All of this information is grouped together into a **process**.
+
+Think of it like this:
+
+A **Program** is like a recipe stored in a cookbook.
+
+A **Process** is someone actually cooking the recipe.
+
+The cook needs:
+
+* Ingredients
+* Kitchen
+* Stove
+* Utensils
+* Time
+
+Similarly, a program needs:
+
+* Memory
+* CPU time
+* Files
+* Resources
+
+Without these, the CPU cannot execute the program.
+
+### Why not execute the program directly?
+
+Suppose the operating system did not create processes.
+
+You open:
+
+* Chrome
+* VS Code
+* Spotify
+
+The CPU would have no way to know:
+
+* Which memory belongs to Chrome.
+* Which files belong to VS Code.
+* Which application should run next.
+* How to isolate one application from another.
+* What resources each application owns.
+
+Processes solve all of these problems by giving every running application its own managed execution environment.
+
+In short:
+
+* A **Program** is static code stored on disk.
+* A **Process** is the operating system's execution environment for that program.
+* The **CPU executes instructions inside a process**, not directly from a program file.

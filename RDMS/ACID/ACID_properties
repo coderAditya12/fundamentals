@@ -1,0 +1,727 @@
+# ACID Properties
+
+**Status:** Learning
+**Created:** 2026-07-23
+
+---
+
+# What is ACID?
+
+**ACID** is a set of four properties that ensure database transactions are processed **reliably, correctly, and safely**, even when failures occur.
+
+ACID stands for:
+
+* **A** → Atomicity
+* **C** → Consistency
+* **I** → Isolation
+* **D** → Durability
+
+These properties ensure that a database remains correct even when multiple users access it simultaneously or when unexpected failures (such as power loss or server crashes) occur.
+
+---
+
+# Why Do We Need ACID?
+
+Imagine transferring **₹500** from your checking account to your savings account.
+
+The transaction consists of two operations:
+
+1. Deduct ₹500 from the checking account.
+2. Add ₹500 to the savings account.
+
+Now imagine the server crashes after deducting the money but before adding it to the savings account.
+
+```text
+Checking Account
+
+₹1000
+
+↓
+
+Deduct ₹500
+
+↓
+
+Server Crash ❌
+
+↓
+
+Savings Account Never Updated
+```
+
+The ₹500 has effectively disappeared.
+
+ACID properties prevent situations like this by ensuring that transactions are executed safely and correctly.
+
+---
+
+# How Does ACID Work?
+
+Every database transaction follows four rules.
+
+```text
+              Transaction
+
+                    │
+
+      ┌─────────────┼─────────────┐
+
+      ▼             ▼             ▼             ▼
+
+ Atomicity     Consistency     Isolation     Durability
+```
+
+Each property protects the transaction in a different way:
+
+* **Atomicity** → Either all operations succeed or none of them do.
+* **Consistency** → The database always remains in a valid state.
+* **Isolation** → Concurrent transactions do not interfere with each other.
+* **Durability** → Once a transaction is committed, the data is permanently stored.
+
+Together, these properties ensure reliable database operations.
+
+---
+
+# Internal Working
+
+When a transaction is executed, the database performs several checks before marking it as successful.
+
+```text
+Start Transaction
+
+        │
+
+        ▼
+
+ Execute Operations
+
+        │
+
+        ▼
+
+ Validate Constraints
+
+        │
+
+        ▼
+
+ Handle Concurrent Transactions
+
+        │
+
+        ▼
+
+ Persist Data
+
+        │
+
+        ▼
+
+ Commit Transaction
+```
+
+If any step fails, the database rolls back the transaction to maintain correctness.
+
+---
+
+# Atomicity
+
+## What is Atomicity?
+
+Atomicity means a transaction is treated as **one indivisible unit**.
+
+It follows the **"All or Nothing"** principle.
+
+Either:
+
+* Every operation succeeds, **or**
+* Every operation is rolled back.
+
+There is no partial completion.
+
+---
+
+## Why Do We Need Atomicity?
+
+Consider a bank transfer.
+
+```text
+Transfer ₹500
+
+│
+
+├── Deduct ₹500 from Account A
+
+└── Add ₹500 to Account B
+```
+
+If the deduction succeeds but the deposit fails, the user's money is lost.
+
+Atomicity prevents this by ensuring that if any operation fails, **every previous operation in the transaction is undone**.
+
+---
+
+## How Does Atomicity Work?
+
+```text
+Begin Transaction
+
+↓
+
+Deduct ₹500
+
+↓
+
+Add ₹500
+
+↓
+
+Success?
+
+      │
+
+  Yes │ No
+
+      ▼
+
+Commit      Rollback
+```
+
+If all operations succeed, the transaction is committed.
+
+Otherwise, the database restores the previous state.
+
+---
+
+## Example
+
+Suppose Alice transfers ₹500 to Bob.
+
+Before:
+
+```text
+Alice = ₹1000
+
+Bob = ₹500
+```
+
+Transaction:
+
+```sql
+UPDATE accounts
+SET balance = balance - 500
+WHERE account_id = 'Alice';
+
+UPDATE accounts
+SET balance = balance + 500
+WHERE account_id = 'Bob';
+```
+
+After Success:
+
+```text
+Alice = ₹500
+
+Bob = ₹1000
+```
+
+If the second update fails,
+
+the first update is rolled back automatically.
+
+Final State:
+
+```text
+Alice = ₹1000
+
+Bob = ₹500
+```
+
+The database returns to its original state.
+
+---
+
+# Consistency
+
+## What is Consistency?
+
+Consistency ensures that every transaction moves the database from **one valid state to another valid state**.
+
+The database must always obey its rules and constraints.
+
+If a transaction violates any rule, it is rejected.
+
+---
+
+## Why Do We Need Consistency?
+
+Imagine a bank account where balances cannot be negative.
+
+Suppose a user tries to withdraw ₹1000 from an account that contains only ₹500.
+
+Without consistency:
+
+```text
+Balance = ₹500
+
+↓
+
+Withdraw ₹1000
+
+↓
+
+Balance = -₹500 ❌
+```
+
+This violates the business rule.
+
+Consistency prevents invalid data from being stored.
+
+---
+
+## How Does Consistency Work?
+
+The database checks constraints before committing a transaction.
+
+Examples include:
+
+* Primary Key constraints
+* Foreign Key constraints
+* CHECK constraints
+* NOT NULL constraints
+* UNIQUE constraints
+
+If any constraint fails,
+
+the transaction is rolled back automatically.
+
+---
+
+## Example 1 — CHECK Constraint
+
+```sql
+CHECK (balance >= 0)
+```
+
+Suppose a transaction produces:
+
+```text
+Balance = -₹200
+```
+
+The database rejects the transaction because it violates the constraint.
+
+---
+
+## Example 2 — Foreign Key Constraint
+
+Suppose we have two tables.
+
+```text
+Customers
+
+↓
+
+Orders
+```
+
+Every order must belong to an existing customer.
+
+If someone inserts an order for a customer that does not exist,
+
+the database rejects the transaction.
+
+This maintains referential integrity.
+
+---
+
+# Common Misconceptions
+
+### ❌ Atomicity means the transaction is fast.
+
+False.
+
+Atomicity is about completing **all operations together**, not about performance.
+
+---
+
+### ❌ Consistency means all database replicas contain the same data.
+
+False.
+
+In ACID, **Consistency** means maintaining database rules and constraints.
+
+Consistency between distributed replicas is a different concept discussed in distributed systems.
+
+---
+
+# Key Takeaways
+
+* ACID is a set of four properties that ensure reliable database transactions.
+* Atomicity follows the **All or Nothing** principle.
+* Consistency ensures the database always remains valid.
+* Constraints such as Primary Keys, Foreign Keys, CHECK, UNIQUE, and NOT NULL help maintain consistency.
+* If any operation or constraint fails, the transaction is rolled back.
+
+---
+
+# Summary
+
+```text
+                    ACID
+
+                      │
+
+     ┌────────────────┴────────────────┐
+
+     ▼                                 ▼
+
+ Atomicity                     Consistency
+
+ All or Nothing          Valid Database State
+
+     │                                 │
+
+Rollback on Failure      Enforce Constraints
+```
+# Internal Working of Durability
+
+Durability is not achieved simply by storing data in a database. The database follows several mechanisms to ensure that committed transactions survive crashes, power failures, and hardware failures.
+
+```text
+Application
+
+      │
+
+      ▼
+
+Begin Transaction
+
+      │
+
+      ▼
+
+Write to Write-Ahead Log (WAL)
+
+      │
+
+      ▼
+
+Modify Database Pages (Memory)
+
+      │
+
+      ▼
+
+Commit Transaction
+
+      │
+
+      ▼
+
+Checkpoint (Flush to Disk)
+
+      │
+
+      ▼
+
+Transaction is Durable
+```
+
+---
+
+# Write-Ahead Logging (WAL)
+
+## What is Write-Ahead Logging?
+
+Write-Ahead Logging (WAL) is a durability technique where the database **first records every change in a log file before updating the actual database**.
+
+This ensures that if the system crashes, the database can recover using the log.
+
+The golden rule is:
+
+> **Log First, Database Later.**
+
+---
+
+## Why Do We Need WAL?
+
+Imagine the database directly updates the disk.
+
+```text
+Update Database
+
+↓
+
+Power Failure ❌
+```
+
+The database may become partially updated and corrupted.
+
+Instead,
+
+```text
+Write to WAL
+
+↓
+
+Flush WAL to Disk
+
+↓
+
+Update Database
+
+↓
+
+Commit
+```
+
+Even if the database crashes during the update, the WAL contains enough information to recover.
+
+---
+
+## How WAL Works
+
+```text
+Transaction Starts
+
+↓
+
+Write Change to WAL
+
+↓
+
+Save WAL on Disk
+
+↓
+
+Modify Database
+
+↓
+
+Commit
+```
+
+During recovery,
+
+the database reads the WAL and completes or rolls back unfinished transactions.
+
+---
+
+# Checkpointing
+
+## What is Checkpointing?
+
+Checkpointing is the process of periodically writing modified data pages from memory to permanent storage.
+
+Instead of writing every page immediately,
+
+the database batches changes together and writes them periodically.
+
+This improves performance while maintaining durability.
+
+---
+
+## Why Do We Need Checkpointing?
+
+Suppose a database has been running for several hours.
+
+Its WAL may contain millions of log records.
+
+If the database crashes,
+
+recovering from the beginning of the log would take a long time.
+
+Checkpointing solves this.
+
+```text
+WAL
+
+↓
+
+Checkpoint
+
+↓
+
+Only Recent Logs Need Recovery
+```
+
+Recovery becomes much faster.
+
+---
+
+# Backup and Recovery
+
+## What is Backup?
+
+A backup is a copy of the database stored separately from the primary database.
+
+Backups protect against:
+
+* Hardware failure
+* Human mistakes
+* Data corruption
+* Accidental deletion
+* Natural disasters
+
+---
+
+## What is Recovery?
+
+Recovery is the process of restoring the database after a failure.
+
+Recovery may use:
+
+* Backups
+* Write-Ahead Logs
+* Transaction Logs
+
+Together they restore the database to a consistent state.
+
+---
+
+# Relationship Between WAL, Checkpointing and Backup
+
+```text
+Transaction
+
+      │
+
+      ▼
+
+Write-Ahead Log (WAL)
+
+      │
+
+      ▼
+
+Checkpoint
+
+      │
+
+      ▼
+
+Database Files
+
+      │
+
+      ▼
+
+Backup
+
+      │
+
+      ▼
+
+Recovery After Failure
+```
+
+Each mechanism serves a different purpose:
+
+* **WAL** protects recent transactions.
+* **Checkpointing** speeds up recovery.
+* **Backups** protect against catastrophic failures.
+
+---
+
+# Advantages
+
+* Ensures reliable database transactions.
+* Prevents partial updates.
+* Protects data during crashes.
+* Maintains data integrity.
+* Supports concurrent users safely.
+* Enables reliable recovery after failures.
+
+---
+
+# Disadvantages
+
+* Additional storage for transaction logs.
+* Higher write overhead because logs must be written.
+* Higher isolation levels reduce concurrency.
+* Serializable transactions may reduce performance.
+* Backup and recovery increase operational complexity.
+
+---
+
+# Common Misconceptions
+
+### ❌ ACID guarantees high performance.
+
+False.
+
+ACID prioritizes **correctness and reliability**, sometimes at the cost of performance.
+
+---
+
+### ❌ Durability means data is immediately written everywhere.
+
+False.
+
+Durability guarantees that committed data survives failures, but replication and storage strategies vary depending on the database.
+
+---
+
+### ❌ WAL is the actual database.
+
+False.
+
+The WAL is a **recovery log**, not the primary data store.
+
+---
+
+### ❌ Backups replace WAL.
+
+False.
+
+Backups and WAL serve different purposes.
+
+* WAL helps recover recent committed transactions.
+* Backups recover from major failures or data loss.
+
+---
+
+# Key Takeaways
+
+* ACID ensures reliable database transactions.
+* Atomicity follows the "All or Nothing" principle.
+* Consistency keeps the database in a valid state.
+* Isolation prevents concurrent transactions from interfering.
+* Durability guarantees committed data survives failures.
+* WAL records changes before updating the database.
+* Checkpointing reduces recovery time.
+* Backups protect against catastrophic failures.
+* Recovery combines backups and transaction logs to restore the database.
+
+---
+
+# Summary
+
+```text
+                     ACID
+
+                        │
+
+     ┌──────────────────┼──────────────────┐
+
+     ▼                  ▼                  ▼                  ▼
+
+ Atomicity        Consistency        Isolation        Durability
+
+ All or Nothing   Valid State      No Interference   Data Never Lost
+        │               │                 │                 │
+        ▼               ▼                 ▼                 ▼
+   Rollback      Constraints     Isolation Levels      WAL
+                                                      │
+                                                      ▼
+                                                Checkpoint
+                                                      │
+                                                      ▼
+                                                   Backup
+                                                      │
+                                                      ▼
+                                                   Recovery
+```
+
+ACID properties work together to ensure that database transactions are **safe, reliable, and fault tolerant**. Atomicity prevents partial execution, Consistency enforces database rules, Isolation manages concurrent transactions, and Durability guarantees that committed data survives failures. Databases implement durability using techniques such as **Write-Ahead Logging (WAL)**, **Checkpointing**, and **Backup & Recovery**, allowing systems like banking, e-commerce, and payment platforms to protect critical data even when unexpected failures occur.
